@@ -29,16 +29,29 @@ Copyright [2025] [Erik Billing, https://his.se/erikb]
 
 import numpy as np
 
-def tcc(familiarity, dPrime, count = 1, returnDetectionSignal = False):
+def tccUCN(dPrime, similarity):
+    """
+    Target Confusability Competition (TCC):
+        * dPrime: scalar, list or numpy array specifying the familiarity (memory matching signal) of each cued target
+        * similarity: list or numpy array specifying similarity for each potential target
+        returns a vector specifying the index of the selected target, for each cued target.
+
+        This is a Python interpretation of the original matlab reference implementation with uncorrelated noise provided by Shurgin et al. (2020).
+    """
+    if not isinstance(dPrime, np.ndarray): dPrime = np.array(dPrime)
+    if not isinstance(similarity, np.ndarray): similarity = np.array(similarity)
+    sig = np.random.normal(loc=0,scale=1,size=(dPrime.size,similarity.size)) + np.tile(similarity.ravel(), (dPrime.size, 1)) * dPrime
+    return np.argmax(sig, axis=1)
+
+def tcc(familiarity, count = 1, returnDetectionSignal = False):
     """
     Target Confusability Competition (TCC):
         * familiarity: list or 1d numpy array specifying the familiarity (memory matching signal) of each potential target
-        * dPrime: the only free parameter of the TCC model
         * count: the number of iterations to execute
         tcc returns a target confusability distribution over each potential target specified by the familiarity parameter. If returnDetectionSignal is true, a (dist,sig,sigMax) tuple is returned, where sig and sigMax represents the detection signal and winning target of each executed iteration.
     """
     if not isinstance(familiarity, np.ndarray): familiarity = np.array(familiarity)
-    sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.shape[0])) + np.tile(familiarity*dPrime, (count, 1))
+    sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.shape[0])) + np.tile(familiarity, (count, 1))
     sigMax = np.argmax(sig, axis=1)
     unique_values, dist = np.unique(sigMax, return_counts=True)
     if returnDetectionSignal:
