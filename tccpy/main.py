@@ -29,6 +29,11 @@ Copyright [2025] [Erik Billing, https://his.se/erikb]
 
 import numpy as np
 
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
 def tccUCN(dPrime, similarity):
     """
     Target Confusability Competition (TCC):
@@ -54,6 +59,8 @@ def tcc(familiarity, count = 1, returnDetectionSignal = False):
     sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.shape[0])) + np.tile(familiarity, (count, 1))
     sigMax = np.argmax(sig, axis=1)
     unique_values, dist = np.unique(sigMax, return_counts=True)
+    if pd is not None and isinstance(familiarity, pd.DataFrame):
+        dist = pd.DataFrame(dist, columns=familiarity.columns)
     if returnDetectionSignal:
         return dist, sig, sigMax
     else:
