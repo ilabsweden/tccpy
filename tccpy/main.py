@@ -55,12 +55,18 @@ def tcc(familiarity, count = 1, returnDetectionSignal = False):
         * count: the number of iterations to execute
         tcc returns a target confusability distribution over each potential target specified by the familiarity parameter. If returnDetectionSignal is true, a (dist,sig,sigMax) tuple is returned, where sig and sigMax represents the detection signal and winning target of each executed iteration.
     """
+    if pd is not None and isinstance(familiarity, pd.DataFrame):
+        columns = familiarity.columns
+        familiarity = familiarity.to_numpy()
+    else:
+        columns = None
     if not isinstance(familiarity, np.ndarray): familiarity = np.array(familiarity)
-    sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.shape[0])) + np.tile(familiarity, (count, 1))
+
+    sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.shape[0])) + np.tile(familiarity.ravel(), (count, 1))
     sigMax = np.argmax(sig, axis=1)
     unique_values, dist = np.unique(sigMax, return_counts=True)
-    if pd is not None and isinstance(familiarity, pd.DataFrame):
-        dist = pd.DataFrame(dist, columns=familiarity.columns)
+    if columns is not None:
+        dist = pd.DataFrame(dist, columns=columns)
     if returnDetectionSignal:
         return dist, sig, sigMax
     else:
