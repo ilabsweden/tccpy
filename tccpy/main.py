@@ -59,7 +59,7 @@ def tcc(familiarity, count = 1, returnDetectionSignal = False):
         labels = familiarity.index
         familiarity = familiarity.to_numpy()
     else:
-        columns = None
+        labels = None
     if not isinstance(familiarity, np.ndarray): familiarity = np.array(familiarity)
 
     sig = np.random.normal(loc=0,scale=1,size=(count,familiarity.size)) + np.tile(familiarity.ravel(), (count, 1))
