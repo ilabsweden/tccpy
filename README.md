@@ -15,6 +15,8 @@ TCC models the memory of each potential target using a memory match signal refer
     dist = tccpy.tcc(familiarity=[0,0,1,2], count=100)
     print(dist) # should return something like array([ 6,  4, 20, 70])
 
+More elaborated examples are found in [demo.ipynb](./demo.ipynb). 
+
 ## Acknowledgments
 
 Copyright [2025] [Erik Billing, https://his.se/erikb]
